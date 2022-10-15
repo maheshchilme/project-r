@@ -1,0 +1,31 @@
+pipeline {
+ agent {
+     label {
+         label 'built-in'
+         customWorkspace '/data/pipeline'
+     }
+ }   
+    stages  {
+        stage ('clone project from git') {
+            steps {
+                    sh 'rm -rf *'
+                    sh 'cp /root/Dockerfile /data/pipeline'
+                    sh 'cp /root/gameoflife.war /data/pipeline'
+                    sh ' git clone https://github.com/Admin-Rohan/game-of-life.git '
+                    sh 'cp -r game-of-life/* /data/pipeline'
+                    sh 'mvn install'
+                    sh 'cp /data/pipeline/gameoflife-web/target/gameoflife.war  /root'
+            }
+            
+        }
+        stage ('run docker file') {
+            steps {
+                    sh 'docker build -t tomcat:1.0 .'
+                    sh 'docker run -itdp 80:8080 tomcat:1.0'
+            }
+                
+        }
+        
+    }    
+    
+}    
